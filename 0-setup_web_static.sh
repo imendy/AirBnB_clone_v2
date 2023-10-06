@@ -1,19 +1,36 @@
 #!/usr/bin/env bash
+# A script that sets up webservers for deployment
 
-# ... (nginx installation if not present)
+if ! command nginx -v &> /dev/null; then
+	sudo apt-get update
+	sudo apt-get install nginx -y
+fi
 
-# Set up directories and a test index.html
 base_dir="/data/web_static/"
 releases_dir="$base_dir/releases/test"
 shared_dir="$base_dir/shared"
 rel_index="$releases_dir/test/index.html"
+nginx_cfgfile="/etc/nginx/sites-available/test_web"
 
-# ... (similar structure to create directories and index.html)
+for dir in "$base_dir" "$releases_dir" "$shared_dir"; do
+	if [ ! -d "$dir" ]; then
+		sudo mkdir -p "$dir"
+	fi
+done
 
-# Change ownership
+if [ ! -f "$rel_index" ]; then
+	touch "$rel_index"
+	echo "Holberton School" | sudo tee "$rel_index" > /dev/null
+fi
+
+if [ -L "$base_dir/current" ]; then
+	sudo unlink "$base_dir/current"
+fi
+
+sudo ln -s "$releases_dir" "$base_dir/current"
+
 sudo chown -R ubuntu:ubuntu /data/
 
-# Nginx configuration
 echo "server {
 	listen 80;
 	server_name endy.tech;
@@ -25,8 +42,8 @@ echo "server {
 	}
 }" | sudo tee "$nginx_cfgfile" > /dev/null
 
-# Reload Nginx
+sudo ln -sf "$nginx_cfgfile" "/etc/nginx/sites-enabled/"
+
 sudo nginx -s reload
 
-# Exit
 exit 0
