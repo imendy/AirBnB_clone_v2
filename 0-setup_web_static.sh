@@ -1,38 +1,32 @@
 #!/usr/bin/env bash
-# Sets up a web server for deployment of web_static.
 
-apt-get update
-apt-get install -y nginx
+# ... (nginx installation if not present)
 
-mkdir -p /data/web_static/releases/test/
-mkdir -p /data/web_static/shared/
-echo "Holberton School" > /data/web_static/releases/test/index.html
-ln -sf /data/web_static/releases/test/ /data/web_static/current
+# Set up directories and a test index.html
+base_dir="/data/web_static/"
+releases_dir="$base_dir/releases/test"
+shared_dir="$base_dir/shared"
+rel_index="$releases_dir/test/index.html"
 
-chown -R ubuntu /data/
-chgrp -R ubuntu /data/
+# ... (similar structure to create directories and index.html)
 
-printf %s "server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    add_header X-Served-By $HOSTNAME;
-    root   /var/www/html;
-    index  index.html index.htm;
+# Change ownership
+sudo chown -R ubuntu:ubuntu /data/
 
-    location /hbnb_static {
-        alias /data/web_static/current;
-        index index.html index.htm;
-    }
+# Nginx configuration
+echo "server {
+	listen 80;
+	server_name endy.tech;
+	root $base_dir/current;
+	index index.html;
 
-    location /redirect_me {
-        return 301 http://github.com/imendy;
-    }
+	location /hbnb_static {
+		alias $base_dir/current;
+	}
+}" | sudo tee "$nginx_cfgfile" > /dev/null
 
-    error_page 404 /404.html;
-    location /404 {
-      root /var/www/html;
-      internal;
-    }
-}" > /etc/nginx/sites-available/default
+# Reload Nginx
+sudo nginx -s reload
 
-service nginx restart
+# Exit
+exit 0
