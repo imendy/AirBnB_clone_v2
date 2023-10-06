@@ -14,7 +14,7 @@ $nginx_conf = "server {
     }
 
     location /redirect_me {
-        return 301 http://cuberule.com/;
+        return 301 http://github.com/imendy;
     }
 
     error_page 404 /404.html;
