@@ -1,49 +1,37 @@
 #!/usr/bin/env bash
-# A script that sets up webservers for deployment
+# Sets up a web server for deployment of web_static.
 
-if ! command nginx -v &> /dev/null; then
-	sudo apt-get update
-	sudo apt-get install nginx -y
-fi
+apt-get update
+apt-get install -y nginx
 
-base_dir="/data/web_static/"
-releases_dir="$base_dir/releases/test"
-shared_dir="$base_dir/shared"
-rel_index="$releases_dir/test/index.html"
-nginx_cfgfile="/etc/nginx/sites-available/test_web"
+mkdir -p /data/web_static/releases/test/
+mkdir -p /data/web_static/shared/
+echo "Holberton School" > /data/web_static/releases/test/index.html
+ln -sf /data/web_static/releases/test/ /data/web_static/current
 
-for dir in "$base_dir" "$releases_dir" "$shared_dir"; do
-	if [ ! -d "$dir" ]; then
-		sudo mkdir -p "$dir"
-	fi
-done
+chown -R ubuntu:ubuntu /data/
 
-if [ ! -f "$rel_index" ]; then
-	touch "$rel_index"
-	echo "Holberton School" | sudo tee "$rel_index" > /dev/null
-fi
+printf %s "server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    add_header X-Served-By $HOSTNAME;
+    root   /var/www/html;
+    index  index.html index.htm;
 
-if [ -L "$base_dir/current" ]; then
-	sudo unlink "$base_dir/current"
-fi
+    location /hbnb_static {
+        alias /data/web_static/current;
+        index index.html index.htm;
+    }
 
-sudo ln -s "$releases_dir" "$base_dir/current"
+    location /redirect_me {
+        return 301 http://github.com/imendy;
+    }
 
-sudo chown -R ubuntu:ubuntu /data/
+    error_page 404 /404.html;
+    location /404 {
+      root /var/www/html;
+      internal;
+    }
+}" > /etc/nginx/sites-available/default
 
-echo "server {
-	listen 80;
-	server_name endy.tech;
-	root $base_dir/current;
-	index index.html;
-
-	location /hbnb_static {
-		alias $base_dir/current;
-	}
-}" | sudo tee "$nginx_cfgfile" > /dev/null
-
-sudo ln -sf "$nginx_cfgfile" "/etc/nginx/sites-enabled/"
-
-sudo nginx -s reload
-
-exit 0
+service nginx restart                                                               
