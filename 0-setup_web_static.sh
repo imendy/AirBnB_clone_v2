@@ -1,37 +1,36 @@
 #!/usr/bin/env bash
-# Sets up a web server for deployment of web_static.
+# Bash script that sets up your web servers for the deployment of web_static
+# run script on both web servers.
+# checks if Nginx is not installed or not executable
+sudo apt update
+sudo apt -y install nginx
 
-apt-get update
-apt-get install -y nginx
+  # Create necessary folders
+sudo mkdir -p /data/web_static/releases/test/
+sudo mkdir -p /data/web_static/shared/
 
-mkdir -p /data/web_static/releases/test/
-mkdir -p /data/web_static/shared/
+
+
 echo "Holberton School" > /data/web_static/releases/test/index.html
-ln -sf /data/web_static/releases/test/ /data/web_static/current
 
-chown -R ubuntu:ubuntu /data/
+# Create a symbolic link /data/web_static/current linked to the /data/web_static/releases/test/ folder
+sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
+sudo chown -R ubuntu:ubuntu /data/
 
-printf %s "server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    add_header X-Served-By $HOSTNAME;
-    root   /var/www/html;
+# Update Nginx configuration to serve /data/web_static/current/ at /hbnb_static
+echo "server {
+    listen 80;
+    server_name _;
+         root /var/www/html;
     index  index.html index.htm;
 
     location /hbnb_static {
         alias /data/web_static/current;
-        index index.html index.htm;
     }
-
-    location /redirect_me {
-        return 301 http://github.com/imendy;
-    }
-
-    error_page 404 /404.html;
-    location /404 {
-      root /var/www/html;
-      internal;
+    location / {
+        # Your other configuration directives, if any
     }
 }" > /etc/nginx/sites-available/default
 
-service nginx restart                                                               
+# sudo nginx -t
+sudo service nginx restart                                         
