@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 """Starts a Flask web application.
+<<<<<<< HEAD
 
+=======
+>>>>>>> efcee7753eb3507bc2768be440ef5b16e1f145b4
 The application listens on 0.0.0.0, port 5000.
 Routes:
     /: Displays 'Hello HBNB!'
@@ -17,4 +20,8 @@ def hello_hbnb():
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     app.run(host="0.0.0.0")
+=======
+    app.run(host="0.0.0.0", port=5000)
+>>>>>>> efcee7753eb3507bc2768be440ef5b16e1f145b4

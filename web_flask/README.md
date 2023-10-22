@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+web_flask
+=======
 ## AirBnB clone - Web framework
 
 
@@ -104,3 +107,4 @@ This project is licensed under the [MIT License](LICENSE.md).
 - Flask: [https://flask.palletsprojects.com/](https://flask.palletsprojects.com/)
 
 Thank you for choosing our AirBnB Clone Web Framework with Flask. Happy coding!
+>>>>>>> f7a06aa4e60c9b861dc6473a5e36e5f7757fa50c
