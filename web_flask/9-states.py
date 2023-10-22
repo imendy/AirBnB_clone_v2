@@ -75,9 +75,10 @@ def states(id=None):
     """ Route function for /states and /states/<id> """
     not_found = False
     if id is not None:
-        states = storage.all(State, id)
+        states = storage.all(State)
+        state = next((s for s in states.values() if s.id == id), None)
         with_id = True
-        if len(states) == 0:
+        if state is None:
             not_found = True
     else:
         states = storage.all(State)
