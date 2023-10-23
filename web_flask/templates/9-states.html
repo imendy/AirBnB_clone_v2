@@ -4,23 +4,28 @@
         <TITLE>HBNB</TITLE>
     </HEAD>
     <BODY>
-    {% if state is mapping %}
-        <H1>States</H1>
-        <UL>
-        {% for s in state.values()|sort(attribute="name") %}
-            <LI>{{ s.id }}: <B>{{ s.name }}</B></LI>
-        {% endfor %}
-        </UL>
-    {% elif state is defined %}
-        <H1>State: {{ state.name }}</H1>
-        <H3>Cities:</H3>
-        <UL>
-        {% for city in state.cities|sort(attribute="name") %}
-            <LI>{{ city.id }}: <B>{{ city.name }}</B></LI>
-        {% endfor %}
-        </UL>
-    {% else %}
+        {% if not_found %}
         <H1>Not found!</H1>
-    {% endif %}
+        {% else %}
+            {% if with_id %}
+            {% for state_id, state in states.items() %}
+            <H1>State: {{ state.name }}</H1>
+            {% endfor %}
+            <H3>Cities:</H3>
+            {% else %}
+            <H1>States</H1>
+            {% endif %}
+            <UL>
+                {% for state_id, state in states.items()|sort(attribute='1.name') %}
+                {% if with_id %}
+                {% for city in state.cities|sort(attribute='name') %}
+                <LI>{{ city.id }}: <B>{{ city.name }}</B></LI>
+                {% endfor %}
+                {% else %}
+                <LI>{{ state.id }}: <B>{{ state.name }}</B></LI>
+                {% endif %}
+                {% endfor %}
+            </UL>
+        {% endif %}
     </BODY>
 </HTML>
